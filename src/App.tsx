@@ -1,26 +1,31 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import SearchBar from './components/SearchBar';
+import VideoList from './components/VideoList';
+import VideoPlayer from './components/VideoPlayer';
+import { YouTubeSource } from './sources/YouTubeSource';
+import { Source, VideoData } from './sources/types';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+const App: React.FC = () => {
+	const [videos, setVideos] = useState<VideoData[]>([]);
+	const [selectedVideo, setSelectedVideo] = useState<VideoData | null>(null);
+	const source: Source = new YouTubeSource();
+
+	const handleSearch = async (query: string) => {
+		const videos = await source.search(query);
+		setVideos(videos);
+	};
+
+	const handleVideoSelect = (video: VideoData) => {
+		setSelectedVideo(video);
+	};
+
+	return (
+		<div>
+			<SearchBar onSearch={handleSearch} />
+			<VideoList videos={videos} onVideoSelect={handleVideoSelect} />
+			{selectedVideo && <VideoPlayer video={selectedVideo} />}
+		</div>
+	);
+};
 
 export default App;
